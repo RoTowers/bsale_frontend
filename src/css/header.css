@@ -1,0 +1,27 @@
+#search{
+    border-radius: 0;
+    border:0;
+    border-bottom: 1px solid;
+    background-color: transparent;
+}
+
+#search-form{
+    margin-right: 1em;
+}
+
+#search-form > label > btn{
+    border: 0;
+}
+
+.bd-load-modal-lg .modal-dialog
+{
+    display: table;
+    position: relative;
+    margin: 0 auto;
+    top: calc(50% - 24px);
+}
+
+.bd-load-modal-lg .modal-dialog .modal-content{
+    background-color: transparent;
+    border: none;
+}

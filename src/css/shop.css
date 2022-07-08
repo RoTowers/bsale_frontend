@@ -1,0 +1,26 @@
+.page-link{
+    color: #f6931f;
+}
+
+.page-link:hover{
+    color: #f6931f;
+}
+
+.active>.page-link {
+    background-color: #f6931f;
+    border-color: #f6931f;
+}
+
+.ui-widget-header {
+    border: 1px solid #dddddd;
+    background: #f7d9b6;
+    color: #333333;
+    font-weight: bold;
+}
+
+.ui-state-active, .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default, .ui-button {
+    border: 1px solid #f6931f;
+    background: #f6931f;
+    font-weight: normal;
+    color: #f6931f;
+}
