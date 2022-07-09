@@ -24,3 +24,77 @@
     font-weight: normal;
     color: #f6931f;
 }
+
+.product-price{
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 16px;
+}
+
+.product-price del{
+    font-size: 16px;
+    font-weight: 400;
+    color: #83868c;
+    margin: 0 7px;
+}
+
+.product-price ins{
+    font-size: 20px;
+    font-weight: 400;
+    color: #f6931f;
+    text-decoration: none;
+}
+
+
+.ribbon{
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    overflow: hidden;
+}
+
+.ribbon::before, .ribbon::after{
+    position: absolute;
+    content: "";
+    z-index: -1;
+    display: block;
+    border: 7px solid #f6931f;
+    border-top-color: transparent;
+    border-left-color: transparent;
+}
+
+.ribbon::before{
+    top: 0px;
+    right: 15px;
+}
+  
+.ribbon::after{
+    bottom: 15px;
+    left: 0px;
+}
+  
+.ribbon span{
+    position: absolute;
+    top:30px;
+    right: 0;
+    transform: rotate(-45deg);
+    width: 200px;
+    background: #f6931f;
+    padding: 10px 0;
+    color: #fff;
+    text-align: center;
+    font-size: 17px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.12);
+}
+
+.form-check-label{
+    font-weight: bold;
+    color: rgb(131, 131, 131)
+}
+
+.form-check-span{
+    font-weight: bold;
+    color: #f6931f;
+}

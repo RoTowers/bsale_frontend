@@ -13,6 +13,12 @@
     border: 0;
 }
 
+#btn-search {
+    border: 0;
+    border-bottom: 1px solid;
+    border-radius: 0;
+}
+
 .bd-load-modal-lg .modal-dialog
 {
     display: table;
@@ -24,4 +30,7 @@
 .bd-load-modal-lg .modal-dialog .modal-content{
     background-color: transparent;
     border: none;
+}
+.navbar{
+    --bs-navbar-padding-y: 1.5rem;
 }

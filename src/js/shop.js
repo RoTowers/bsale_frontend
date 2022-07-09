@@ -1,7 +1,11 @@
 $( document ).ready(function() {
-    const URL_START = "http://127.0.0.1:8000/api/products";
+    const DOMAIN = "http://127.0.0.1:8001";
+    const URL_START = `${DOMAIN}/api/products`;
     let isSearch = false;
+    let isFilter = false;
     let searchText = '';
+    let categoriesSelected = [];
+    let priceFilter = {};
 
     // Se buscan las categorias y los productos al iniciar la pagina
     showProducts(URL_START, null, true);
@@ -9,15 +13,13 @@ $( document ).ready(function() {
     /*
     * Funcion que consume la api y obtiene los resultados paginados
     */
-    function showProducts(url, search = null, start = null, options = null){
-        console.log(options);
+    function showProducts(url, search = null, start = null){
         let request = {
             url: url,
             method: 'GET',
             data: {
                 q: search,
-                s: start,
-                options: options
+                s: start
             },
             beforeSend: function () {
                 $('.modal_loading').modal('show');
@@ -43,9 +45,42 @@ $( document ).ready(function() {
             }
         };
 
-        /* if(!search){
+        if(!search && !start){
             delete request.data;
-        } */
+        }
+
+        $.ajax(request);
+    };
+
+    function showProductsFilter(url, options = null){
+        let request = {
+            url: url,
+            method: 'POST',
+            data: {
+                options: options
+            },
+            beforeSend: function () {
+                $('.modal_loading').modal('show');
+            },
+            complete: function(){
+                setTimeout(function(){
+                    $('.modal_loading').modal('hide');
+                }, 500);
+            },
+            success: function(response) {
+                // Se llama a la funcion que dibuja las tarjetas de productos
+                fillGrid(response.data.data);
+                // Se procede a llamar a la funcion que agrega la paginacion
+                pagination(response.data.links);
+            },
+            error: function (request, status, error) {
+                Swal.fire(
+                  'Error!',
+                  'Ha ocurrido un error interno, por favor intente más tarde',
+                  'error'
+                );
+            }
+        };
 
         $.ajax(request);
     };
@@ -54,18 +89,35 @@ $( document ).ready(function() {
         $('#gallery-products').empty();
         // Se agregan los productos como grilla en el DOM, con la informacion y el botón de agregar al carrito
         products.map((product) => {
+            let price = '';
+            if(product.discount > 0){
+                price = `
+                <div class="product-price">                      
+                    <del>${ new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format((product.price)) } CLP</del> 
+                    <ins>${ new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format((product.price - ((product.price * product.discount) / 100))) } CLP</ins>
+                </div>
+                `;
+            }else{
+                price = `
+                <div class="product-price">
+                    <ins>${ new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(product.price) } CLP</ins>
+                </div>
+                `;
+            }
+
             $('#gallery-products').append(`
-                <div class="col mb-5">
+                <div class="col-md-4 mb-5">
                     <div class="card h-100">
+                        ${product.discount > 0 ? '<div class="ribbon"><span>-'+product.discount+'%</span></div>' : ''}
                         <!-- Product image-->
-                        <img class="card-img-top" src="${product.url_image}" alt="https://dummyimage.com/450x300/404040/dbdbdb.jpg&text=BSALE" />
+                        <img class="card-img-top h-100" src="${product.url_image ? product.url_image : "https://dummyimage.com/450x300/b0b0b0/dbdbdb.jpg&text=BSALE"}" />
                         <!-- Product details-->
-                        <div class="card-body p-4">
+                        <div class="card-body">
                             <div class="text-center">
                                 <!-- Product name-->
                                 <h5 class="fw-bolder">${product.name}</h5>
                                 <!-- Product price-->
-                                ${product.price} / ${product.price * product.discount}
+                                ${price}
                             </div>
                         </div>
                         <!-- Product actions-->
@@ -83,10 +135,10 @@ $( document ).ready(function() {
             $('#categories').append(`
                 <div class="d-flex justify-content-between mt-2">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="categories[]" value="" id="filter${index + 1}">
-                        <label class="form-check-label" for="filter${index + 1}"> ${category.name} </label>
+                        <input class="form-check-input" type="checkbox" name="categories[]" value="${category.id}" id="filter${index + 1}">
+                        <label class="form-check-label" for="filter${index + 1}"> ${capitalize(category.name)} </label>
                     </div>
-                    <span>${category.count}</span>
+                    <span class="form-check-span">${category.count}</span>
                 </div>
             `);
         });
@@ -106,7 +158,7 @@ $( document ).ready(function() {
                 `);
             }else if(i==links.length - 1){
                 $('#pagination').append(`
-                    <li class="page-item">
+                    <li class="page-item ${!link.url ? 'disabled' : ''}">
                         <a class="page-link" href="${link.url}" aria-disabled="${link.url ? false : true}">>></a>
                     </li>
                 `);
@@ -124,8 +176,9 @@ $( document ).ready(function() {
     */
     $('#btn-search').on('click', function(){
         searchText = $("#search").val();
-        let url = "http://127.0.0.1:8000/api/search";
+        let url = `${DOMAIN}/api/search`;
         isSearch = true;
+        isFilter = false;
         showProducts(url, searchText);
     });
 
@@ -138,6 +191,11 @@ $( document ).ready(function() {
         let url = $(this).attr('href');
         if(isSearch){
             showProducts(url, searchText);
+        }else if(isFilter){
+            showProductsFilter(url, {
+                categories: categoriesSelected,
+                price: priceFilter
+            });
         }else{
             showProducts(url);
         }
@@ -159,10 +217,26 @@ $( document ).ready(function() {
     $("#amount").val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
         " - $" + $( "#slider-range" ).slider( "values", 1 ) );
 
-    $("#btn-filtrar").on("click", function(){
-        showProducts(URL_START, null, null, {
-            categories: $("input[name=categories]").val()
+    $("#btn-filtrar").on("click", function(e){
+        categoriesSelected = new Array();
+        $.each($("input[name='categories[]']:checked"), function() {
+            categoriesSelected.push($(this).val());
+        });
+
+        priceFilter = {
+            min: $("#slider-range").slider("values", 0),
+            max: $("#slider-range").slider("values", 1)
+        }
+
+        isFilter = true;
+        isSearch = false;
+        
+        showProductsFilter(URL_START, {
+            categories: categoriesSelected,
+            price: priceFilter
         });
     });
+
+    const capitalize = s => s && s[0].toUpperCase() + s.slice(1);
 });
 
