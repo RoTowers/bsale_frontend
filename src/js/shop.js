@@ -8,8 +8,31 @@ $( document ).ready(function() {
     let priceFilter = {};
     let orderingSelected = 1;
 
-    // Se buscan las categorias y los productos al iniciar la pagina
-    showProducts(URL_START, null, true);
+    if (window.location.href.indexOf("?q=") > -1) {
+        searchText = getParameterValue("q");
+        $("#search").val(searchText);
+
+        // Se resetea el ordenamiento
+        if(isFilter){
+            $("#ordering-select").val('1');
+            orderingSelected = $("#ordering-select").val();
+        }
+
+        let url = `${DOMAIN}/api/search`;
+        isSearch = true;
+        isFilter = false;
+        showProducts(url, searchText, true);
+    }else{
+        // Se buscan las categorias y los productos al iniciar la pagina
+        showProducts(URL_START, null, true);
+    }
+
+    function getParameterValue(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
 
     /*
     * Funcion que consume la api y obtiene los resultados paginados
@@ -33,9 +56,12 @@ $( document ).ready(function() {
             },
             success: function(response) {
                 // Se procede a llamar a la funcion que agrega la paginacion
-                if(start)
+                if(start){
                     showCategories(response.data2);
                     startRange(response.data3[0].min, response.data3[0].max);
+                    start = false;
+                }
+
                 fillGrid(response.data.data);
                 pagination(response.data.links);
             },
@@ -109,7 +135,9 @@ $( document ).ready(function() {
                     <div class="card h-100">
                         ${product.discount > 0 ? '<div class="ribbon"><span>-'+product.discount+'%</span></div>' : ''}
                         <!-- Product image-->
-                        <img class="card-img-top h-100" src="${product.url_image ? product.url_image : "https://dummyimage.com/450x300/b0b0b0/dbdbdb.jpg&text=BSALE"}" />
+                        <div style="height: 15em; text-align: center;">
+                            <img class="img-thumbnail" src="${product.url_image ? product.url_image : "https://dummyimage.com/450x300/b0b0b0/dbdbdb.jpg&text=BSALE"}" />
+                        </div>
                         <!-- Product details-->
                         <div class="card-body">
                             <div class="text-center">
