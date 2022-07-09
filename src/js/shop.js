@@ -1,11 +1,12 @@
 $( document ).ready(function() {
-    const DOMAIN = "http://127.0.0.1:8001";
+    const DOMAIN = "http://127.0.0.1:8000";
     const URL_START = `${DOMAIN}/api/products`;
     let isSearch = false;
     let isFilter = false;
     let searchText = '';
     let categoriesSelected = [];
     let priceFilter = {};
+    let orderingSelected = 1;
 
     // Se buscan las categorias y los productos al iniciar la pagina
     showProducts(URL_START, null, true);
@@ -19,7 +20,8 @@ $( document ).ready(function() {
             method: 'GET',
             data: {
                 q: search,
-                s: start
+                s: start,
+                o: orderingSelected
             },
             beforeSend: function () {
                 $('.modal_loading').modal('show');
@@ -33,6 +35,7 @@ $( document ).ready(function() {
                 // Se procede a llamar a la funcion que agrega la paginacion
                 if(start)
                     showCategories(response.data2);
+                    startRange(response.data3[0].min, response.data3[0].max);
                 fillGrid(response.data.data);
                 pagination(response.data.links);
             },
@@ -44,10 +47,6 @@ $( document ).ready(function() {
                 );
             }
         };
-
-        if(!search && !start){
-            delete request.data;
-        }
 
         $.ajax(request);
     };
@@ -174,13 +173,27 @@ $( document ).ready(function() {
     * Al hacer click en el botón search se llama a la funcion showProducts con la url para realizar la busqueda y con el texto a buscar
     * Se deja isSearch como true para que al clickear la paginacion la funcion sepa que debe agregar el texto a buscar
     */
-    $('#btn-search').on('click', function(){
+    $('#btn-search').on('click', search);
+
+    // En caso de que al escribir en el buscador presione la tecla enter
+    $('#search').keyup(function(e){
+        if(e.keyCode == 13)
+            search();
+    });
+
+    function search(){
+        // Se resetea el ordenamiento
+        if(isFilter){
+            $("#ordering-select").val('1');
+            orderingSelected = $("#ordering-select").val();
+        }
+
         searchText = $("#search").val();
         let url = `${DOMAIN}/api/search`;
         isSearch = true;
         isFilter = false;
         showProducts(url, searchText);
-    });
+    }
 
     /*
     * Al hacer click en la paginacion se llama a la funcion que consume la api y obtiene los productos
@@ -194,30 +207,51 @@ $( document ).ready(function() {
         }else if(isFilter){
             showProductsFilter(url, {
                 categories: categoriesSelected,
-                price: priceFilter
+                price: priceFilter,
+                order: orderingSelected
             });
         }else{
             showProducts(url);
         }
     });
 
-    $("#slider-range").slider({
-        range: true,
-        min: 0,
-        max: 50000,
-        values: [ 0, 50000 ],
-        slide: function( event, ui ) {
-          $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-        }
-    });
-    
-    /*
-    * Inicializa los valores en el label del slider-range
-    */
-    $("#amount").val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
-        " - $" + $( "#slider-range" ).slider( "values", 1 ) );
+    // Inicializa el Slider Range con los valores minimo y maximo
+    function startRange(priceMin, priceMax) {
+        $("#slider-range").slider({
+            range: true,
+            min: 0,
+            max: priceMax + 10000,
+            values: [ priceMin, priceMax ],
+            slide: function( event, ui ) {
+                let min = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(ui.values[ 0 ]);
+                let max = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(ui.values[ 1 ]);
+                $( "#amount" ).val( min + " - " + max );
+            }
+        });
+        
+        /*
+        * Inicializa los valores en el label del slider-range
+        */
+        $("#amount").val( function(){
+            let min = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format($( "#slider-range" ).slider( "values", 0 ));
+            let max = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format($( "#slider-range" ).slider( "values", 1 ));
+            return min + " - " + max; 
+        });
+    };
 
-    $("#btn-filtrar").on("click", function(e){
+
+    /*
+    * Funcion que toma los filtros de categorias y rangos de precios y llama a la api con esos parametros
+    */
+    $("#btn-filtrar").on("click", function(){
+        // Se resetea el ordenamiento
+        $("#ordering-select").val('1');
+        orderingSelected = $("#ordering-select").val();
+
+        filter();
+    });
+
+    function filter(){
         categoriesSelected = new Array();
         $.each($("input[name='categories[]']:checked"), function() {
             categoriesSelected.push($(this).val());
@@ -233,10 +267,22 @@ $( document ).ready(function() {
         
         showProductsFilter(URL_START, {
             categories: categoriesSelected,
-            price: priceFilter
+            price: priceFilter,
+            order: orderingSelected
         });
-    });
+    }
 
     const capitalize = s => s && s[0].toUpperCase() + s.slice(1);
+
+    $('#ordering-select').on('change', function() {
+        orderingSelected = $(this).val();
+        if(isSearch){
+            search();
+        }else if(isFilter){
+            filter();
+        }else{
+            showProducts(URL_START);
+        }
+    });
 });
 

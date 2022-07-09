@@ -19,8 +19,8 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="shop.html">Tienda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="shop.html">Tienda</a></li>
                     </ul>
                     <div class="d-flex" id="search-form">
                         <input type="text" class="form-control" id="search" placeholder="Búsqueda del producto">
@@ -73,10 +73,16 @@
                     </div>
     
                     <div class="col-md-9">
-                        <div class="container px-4 px-lg-5 mt-5">
+                        <div class="container px-4 px-lg-5">
+                            <select id="ordering-select" class="form-select mb-3" style="width: 10em;">
+                                <option value="1" selected>Nombre A - Z</option>
+                                <option value="2">Nombre Z - A</option>
+                                <option value="3">Precio Menor a Mayor</option>
+                                <option value="4">Precio Mayor a Menor</option>
+                            </select>
                             <div id="gallery-products" class="row justify-content-center">
                             </div>
-                            <nav aria-label="Page navigation example">
+                            <nav aria-label="Page navigation">
                                 <ul class="pagination justify-content-end" id="pagination">
                                   
                                 </ul>
