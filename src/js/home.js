@@ -1,5 +1,5 @@
 $( document ).ready(function() {
-    const DOMAIN = "http://127.0.0.1:8000";
+    const DOMAIN = "https://fierce-woodland-71648.herokuapp.com";
     const URL_START = `${DOMAIN}/api/some`;
     const QUANTITY = 6;
     
