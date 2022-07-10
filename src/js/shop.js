@@ -179,7 +179,7 @@ $( document ).ready(function() {
     function pagination(links){
         $('#pagination').empty();
         links.map((link, i) => {
-            link.url = link.url.replace('http', 'https');
+            link.url = link.url ? link.url.replace('http', 'https') : link.url;
             if(i==0){
                 $('#pagination').append(`
                     <li class="page-item ${!link.url ? 'disabled' : ''}">
