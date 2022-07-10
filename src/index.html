@@ -30,13 +30,52 @@
                         </label>
                     </div>
                     
-                    <form class="d-flex">
-                        <button class="btn btn-outline-dark" type="submit">
+                    <div class="d-flex">
+                        <button class="btn btn-outline-dark" id="cart-button" type="button"  data-bs-toggle="modal" data-bs-target="#cart">
                             <i class="bi-cart-fill me-1"></i>
                             Carrito
-                            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                            <span id="cart-counter" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
                         </button>
-                    </form>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="cart" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="staticBackdropLabel">Carrito de Compras</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">
+                                                        Artículo
+                                                    </th>
+                                                    <th scope="col">
+                                                        Precio
+                                                    </th>
+                                                    <th scope="col">
+                                                        Cantidad
+                                                    </th>
+                                                    <th scope="col">
+                                                        Total a pagar:
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cart-container">
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                      <button type="button" class="btn btn-primary btn-buy">Realizar la Compra</button>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>

@@ -34,3 +34,26 @@
 .navbar{
     --bs-navbar-padding-y: 1.5rem;
 }
+
+.btn-buy{
+    background-color: #eeac5f;
+    border-color: #eb993b;
+}
+
+.btn-buy:hover{
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+.btn-buy:active{
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}
+
+.btn-buy:focus{
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}

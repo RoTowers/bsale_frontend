@@ -122,3 +122,30 @@
     background-position-x: -200%;
     }
 }
+
+.add-to-cart{
+    background-color: #eeac5f;
+    border-color: #eeac5f;
+    color: #ffffff;
+}
+
+.increment {
+    padding:.5em 1em .5em 1em;
+    border-radius: 50%;
+    cursor: pointer;
+    background:rgb(255, 255, 255); 
+    color:black; 
+    border: 1px solid black;
+    text-align:center; 
+    display:inline-block;
+}
+
+.increment:hover {
+    background:black;
+    color: rgb(255, 255, 255);
+}
+
+.increment-field{
+    width:3em;
+    text-align: center;
+}
