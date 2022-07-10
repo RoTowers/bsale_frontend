@@ -93,13 +93,13 @@ $( document ).ready(function() {
     * Se deja isSearch como true para que al clickear la paginacion la funcion sepa que debe agregar el texto a buscar
     */
     $('#btn-search').on('click', function(){
-        window.location.replace(`./shop.html?q=${$('#search').val()}`);
+        window.location.replace(`https://pacific-river-42460.herokuapp.com/src/shop.html?q=${$('#search').val()}`);
     });
 
     // En caso de que al escribir en el buscador presione la tecla enter
     $('#search').keyup(function(e){
         if(e.keyCode == 13)
-            window.location.replace(`./shop.html?q=${$(this).val()}`);
+            window.location.replace(`https://pacific-river-42460.herokuapp.com/src/shop.html?q=${$(this).val()}`);
     });
 
     // Al hacer click en el boton agregar al carrito obtiene el producto en la data del elemento y lo envia a la funcion addToCart
