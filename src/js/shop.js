@@ -1,13 +1,21 @@
 $( document ).ready(function() {
     const DOMAIN = "https://fierce-woodland-71648.herokuapp.com";
+    /** URL inicial a la API */
     const URL_START = `${DOMAIN}/api/products`;
+    /** variable que contiene true si la accion actual es por una busqueda de texto */
     let isSearch = false;
+    /** variable que contiene true si la accion actual es por filtro */
     let isFilter = false;
+    /** Contiene el texto ingresado del buscador */
     let searchText = '';
+    /** Guarda las categorias seleccionadas en un arreglo */
     let categoriesSelected = [];
+    /** Objeto que contiene los valores seleccionados del filtro de rango de precios */
     let priceFilter = {};
+    /** Contiene el valor de el select de ordenamiento */
     let orderingSelected = 1;
 
+    /** Actualiza el contador del icono de carrito de compras en el header */
     updateCart();
 
     if (window.location.href.indexOf("?q=") > -1) {
@@ -317,16 +325,26 @@ $( document ).ready(function() {
         }
     });
 
-    // Inicializa el Slider Range con los valores minimo y maximo
+    /**
+    * Inicializa el Slider Range con los valores minimo y maximo
+    * @param {number} priceMin - Precio minimo considerando todos los productos que existen.
+    * @param {number} priceMax - Precio maximo considerando todos los productos que existen.
+    */
     function startRange(priceMin, priceMax) {
         $("#slider-range").slider({
             range: true,
+            /** minimo que admitira el slider */
             min: 0,
+            /** maximo que admitira el slider */
             max: priceMax + 10000,
+            /** valores seleccionados en el slider al iniciar, son los que vienen de la consulta a la API */
             values: [ priceMin, priceMax ],
+            /** Cada vez que se produce un evento del slider modifica el rango seleccionado */
             slide: function( event, ui ) {
+                /** Agrega formato al precio minimo y maximo */
                 let min = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(ui.values[ 0 ]);
                 let max = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(ui.values[ 1 ]);
+                /** Agrega el rango como texto al contenedor amount */
                 $( "#amount" ).val( min + " - " + max );
             }
         });
@@ -335,11 +353,14 @@ $( document ).ready(function() {
         * Inicializa los valores en el label del slider-range
         */
         $("#amount").val( function(){
+            /** Agrega formato al precio minimo y maximo */
             let min = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format($( "#slider-range" ).slider( "values", 0 ));
             let max = new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format($( "#slider-range" ).slider( "values", 1 ));
+            /** Agrega el rango como texto al contenedor amount */
             return min + " - " + max; 
         });
     };
+
     /*
     * Funcion que toma los filtros de categorias y rangos de precios y llama a la api con esos parametros
     */
@@ -348,23 +369,32 @@ $( document ).ready(function() {
         $("#ordering-select").val('1');
         orderingSelected = $("#ordering-select").val();
 
+        /** Llama a la function filter */
         filter();
     });
 
+    /**
+    * Obtiene los valores de los filtros de categorias y rango de precios y los envia showProductsFilter
+    */
     function filter(){
         categoriesSelected = new Array();
+        /** recorre cada check de categorias que este checkeado */
         $.each($("input[name='categories[]']:checked"), function() {
+            /** Agrega el valor del input check a la lista de categorias seleccionadas */
             categoriesSelected.push($(this).val());
         });
 
+        /** Guarda el minimo y maximo seleccionado en el Slider Range */
         priceFilter = {
             min: $("#slider-range").slider("values", 0),
             max: $("#slider-range").slider("values", 1)
         }
 
+        /** Cambia el valor segun la accion actual, ya que será filtro, no busqueda de texto */
         isFilter = true;
         isSearch = false;
         
+        /** Envía los filtros a la funcion con los parametros respectivos */
         showProductsFilter(URL_START, {
             categories: categoriesSelected,
             price: priceFilter,
@@ -372,6 +402,7 @@ $( document ).ready(function() {
         });
     }
 
+    /** Funcion que cambia a mayuscula la primera letra del texto a modificar */
     const capitalize = s => s && s[0].toUpperCase() + s.slice(1);
 
     $('#ordering-select').on('change', function() {
