@@ -115,11 +115,8 @@ function showProductsFilter(url, options = null){
 
 Agrega los productos como galeria en el DOM, con la informacion y el botón de agregar al carrito.
 
-<<<<<<< HEAD
-| Name | Type                    |Default|Description
-=======
-| Name | Type                    |Default|Description|
->>>>>>> 2d4f1d7b9fec4db7a5f75aec7e92fefa86c27a58
+
+| Name | Type | Default | Description
 | --- | --- |---
 | `products`   | Object    ||Lista de productos
 
