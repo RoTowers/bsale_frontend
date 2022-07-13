@@ -36,38 +36,49 @@ $( document ).ready(function() {
         return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     };
 
-    /*
-    * Funcion que consume la api y obtiene los resultados paginados
-    */
-    function showProducts(url, search = null, start = null){
+    /**
+     * Funcion que consume la api y obtiene los resultados paginados.
+     * @param {string} url - url del endpoint de la API.
+     * @param {string} search - texto a buscar.
+     * @param {string} start - true si es la primera vez que se llama a la funcion.
+     */
+    function showProducts(url, search = null, start = false){
         let request = {
             url: url,
             method: 'GET',
             data: {
                 q: search,
                 s: start,
+                /** Se agrega un parametro o para que la API retorne los productos ordenados. */
                 o: orderingSelected
             },
             beforeSend: function () {
+                /** se inicia y muestra el loading al iniciar la llamada a la API */
                 $('.modal_loading').modal('show');
             },
             complete: function(){
+                /** Se esconde el loading despues de terminada la operacion */
                 setTimeout(function(){
                     $('.modal_loading').modal('hide');
                 }, 500);
             },
             success: function(response) {
-                // Se procede a llamar a la funcion que agrega la paginacion
+                /** En caso que sea la primera vez que se llama a la funcion */
                 if(start){
+                    /** Se agregan los filtros de categorias y rangos de Precios
+                     * tambien se deja la variable start como falso para que no realice esta operacion nuevamente
+                     */
                     showCategories(response.data2);
                     startRange(response.data3[0].min, response.data3[0].max);
                     start = false;
                 }
-
+                /** Llama a la funcion que dibuja la galeria con las tarjetas de los productos */
                 fillGrid(response.data.data);
+                /** Se procede a llamar a la funcion que implementa la paginacion*/
                 pagination(response.data.links);
             },
             error: function (request, status, error) {
+                /** Si hubo algún error se despliega este mensaje en un alerta con Sweet Alert */
                 Swal.fire(
                   'Error!',
                   'Ha ocurrido un error interno, por favor intente más tarde',
@@ -79,6 +90,11 @@ $( document ).ready(function() {
         $.ajax(request);
     };
 
+    /**
+     * Funcion que consume la api enviandole algunos filtros (rango de precios y categorias seleccionadas) y obtiene los resultados paginados.
+     * @param {string} url - url del endpoint de la API.
+     * @param {Object} options - objeto con las opciones de filtrado.
+     */
     function showProductsFilter(url, options = null){
         let request = {
             url: url,
@@ -87,20 +103,23 @@ $( document ).ready(function() {
                 options: options
             },
             beforeSend: function () {
+                /** se inicia y muestra el loading al iniciar la llamada a la API */
                 $('.modal_loading').modal('show');
             },
             complete: function(){
+                /** Se esconde el loading despues de terminada la operacion */
                 setTimeout(function(){
                     $('.modal_loading').modal('hide');
                 }, 500);
             },
             success: function(response) {
-                // Se llama a la funcion que dibuja las tarjetas de productos
+                /** Llama a la funcion que dibuja la galeria con las tarjetas de los productos */
                 fillGrid(response.data.data);
-                // Se procede a llamar a la funcion que agrega la paginacion
+                /** Se procede a llamar a la funcion que implementa la paginacion*/
                 pagination(response.data.links);
             },
             error: function (request, status, error) {
+                /** Si hubo algún error se despliega este mensaje en un alerta con Sweet Alert */
                 Swal.fire(
                   'Error!',
                   'Ha ocurrido un error interno, por favor intente más tarde',
@@ -112,11 +131,22 @@ $( document ).ready(function() {
         $.ajax(request);
     };
 
+    /**
+     * Agrega los productos como galeria en el DOM, con la informacion y el botón de agregar al carrito
+     * @param {Object} products - lista de productos.
+     */
     function fillGrid(products){
+        /** Empieza limpiando el elemento que contiene la galeria de productos */
         $('#gallery-products').empty();
-        // Se agregan los productos como grilla en el DOM, con la informacion y el botón de agregar al carrito
+        
+        /** Analiza la lista de productos */
         products.map((product) => {
+            /** variable que guardará codigo HTML referente al precio que se agregará a la tarjeta de producto */
             let price = '';
+
+            /** Si el producto contiene descuento, entonces se agrega el codigo HTML contemplando el precio inicial y el precio con descuento 
+             * de lo contrario, solo se agregará el precio inicial
+            */
             if(product.discount > 0){
                 price = `
                 <div class="product-price">                      
@@ -132,6 +162,7 @@ $( document ).ready(function() {
                 `;
             }
 
+            /** Agrega el codigo HTML de la tarjeta de producto a la galeria, con sus respectivos datos como, imagen, nombre, precio */
             $('#gallery-products').append(`
                 <div class="col-md-4 mb-5">
                     <div class="card h-100">
