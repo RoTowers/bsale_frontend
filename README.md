@@ -4,15 +4,15 @@
 
 Los métodos más relevantes se detallarán a continuación.
 
-#### showProducts(url, search, start)
+### showProducts(url, search, start)
 
 Funcion que consume la api y obtiene el resultado de los productos paginados.
 
-| Name | Type                    |Default|Description|
-| ------------- | ------------------------------ |------------------------------|
-| `url`      | string      ||url del endpoint de la API 
-| `search`   | string    |null|Texto a buscar
-| `start`   | boolean    |false|`true` si es la primera vez que se llama a la funcion
+| Name | Type | Default | Description |
+| ------------ | ------------ | ------------ | ------------ |
+| `url`      | string      ||url del endpoint de la API |
+| `search`   | string    |null|Texto a buscar |
+| `start`   | boolean    |false|`true` si es la primera vez que se llama a la funcion |
 
 ```javascript
 function showProducts(url, search = null, start = false){
@@ -64,14 +64,14 @@ function showProducts(url, search = null, start = false){
 };
 ```
 
-#### showProductsFilter(url, options)
+### showProductsFilter(url, options)
 
 Funcion que consume la API enviandole algunos filtros `(rango de precios y categorias seleccionadas)` y obtiene los resultados paginados.
 
 | Name | Type                    |Default|Description|
-| ------------- | ------------------------------ |------------------------------|
-| `url`      | string      ||url del endpoint de la API
-| `options`   | Object    |null|Objeto con las opciones de filtrado
+| ------------ | ------------ | ------------ | ------------ |
+| `url`      | string      ||url del endpoint de la API |
+| `options`   | Object    |null|Objeto con las opciones de filtrado |
 
 ```javascript
 function showProductsFilter(url, options = null){
@@ -111,7 +111,7 @@ function showProductsFilter(url, options = null){
 };
 ```
 
-#### fillGrid(products)
+### fillGrid(products)
 
 Agrega los productos como galeria en el DOM, con la informacion y el botón de agregar al carrito.
 
