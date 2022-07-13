@@ -4,7 +4,7 @@
 
 Los métodos más relevantes se detallarán a continuación.
 
-####showProducts(url, search, start)
+#### showProducts(url, search, start)
 
 Funcion que consume la api y obtiene el resultado de los productos paginados.
 
@@ -64,7 +64,7 @@ function showProducts(url, search = null, start = false){
 };
 ```
 
-####showProductsFilter(url, options)
+#### showProductsFilter(url, options)
 
 Funcion que consume la API enviandole algunos filtros `(rango de precios y categorias seleccionadas)` y obtiene los resultados paginados.
 
@@ -111,14 +111,14 @@ function showProductsFilter(url, options = null){
 };
 ```
 
-####fillGrid(products)
+#### fillGrid(products)
 
 Agrega los productos como galeria en el DOM, con la informacion y el botón de agregar al carrito.
 
 
-| Name | Type | Default | Description
-| --- | --- |---
-| `products`   | Object    ||Lista de productos
+| Name | Type | Default | Description |
+| ------------ | ------------ | ------------ | ------------ |
+| `products`   | Object    |  | Lista de productos |
 
 ```javascript
 function fillGrid(products){
