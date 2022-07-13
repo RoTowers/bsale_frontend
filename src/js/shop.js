@@ -133,9 +133,9 @@ $( document ).ready(function() {
 
     /**
      * Agrega los productos como galeria en el DOM, con la informacion y el botón de agregar al carrito
-     * @param {Object} products - lista de productos.
+     * @param {Array} products - lista de productos.
      */
-    function fillGrid(products){
+    function fillGrid(products = []){
         /** Empieza limpiando el elemento que contiene la galeria de productos */
         $('#gallery-products').empty();
         
@@ -190,8 +190,14 @@ $( document ).ready(function() {
         });
     }
 
-    function showCategories(categories){
+    /**
+     * Agrega los el filtro de categorias, con el nombre y la cantidad de productos por categoria
+     * @param {Array} categories - lista de categorias.
+     */
+    function showCategories(categories = []){
+        /** Recorre la lista de categorias */
         categories.map((category, index) => {
+            /** Agrega la categoria con un checkbox al contenedor del filtro con sus repectivos datos (id, name, count) */
             $('#categories').append(`
                 <div class="d-flex justify-content-between mt-2">
                     <div class="form-check">
@@ -204,25 +210,33 @@ $( document ).ready(function() {
         });
     }
 
-    /*
-    * Se agregan los elementos para la paginacion en el DOM según la cantidad de paginas sean  con sus respectivos enlaces a la api
-    */
+    /**
+     * Agrega los elementos para la paginacion en el DOM según la cantidad de paginas sean con sus respectivos enlaces a la API
+     * @param {Array} link - lista de categorias.
+     */
     function pagination(links){
+        /** Limpia el contenedor de la paginacion */
         $('#pagination').empty();
+        /** Recorre la lista de links de paginacion */
         links.map((link, i) => {
+            /** Si el indice es el primero (si es 0) entonces agrega el primer link con el texto '<<' */
             if(i==0){
                 $('#pagination').append(`
                     <li class="page-item ${!link.url ? 'disabled' : ''}">
                         <a class="page-link" href="${link.url}" tabindex="-1" aria-disabled="${link.url ? false : true}"><<</a>
                     </li>
                 `);
-            }else if(i==links.length - 1){
+            }
+            /** Si el indice es el ultimo entonces agrega el link con el texto '>>' */
+            else if(i==links.length - 1){
                 $('#pagination').append(`
                     <li class="page-item ${!link.url ? 'disabled' : ''}">
                         <a class="page-link" href="${link.url}" aria-disabled="${link.url ? false : true}">>></a>
                     </li>
                 `);
-            }else{
+            }
+            /** De lo contrario agrega el enlace como cualquier otro */
+            else{
                 $('#pagination').append(`
                     <li class="page-item ${link.active ? 'active' : ''}"><a class="page-link" href="${link.url}">${link.label}</a></li>
                 `);
@@ -242,36 +256,63 @@ $( document ).ready(function() {
             search();
     });
 
+    /**
+     * Funcion que realiza el proceso de busqueda
+     */
     function search(){
-        // Se resetea el ordenamiento
+        /**
+         * En el caso que la ultima accion sea el filtro de productos
+         * Se resetea el ordenamiento
+         */
         if(isFilter){
             $("#ordering-select").val('1');
             orderingSelected = $("#ordering-select").val();
         }
 
+        /** Obtiene el texto a buscar de la <input type="text"> de busqueda */
         searchText = $("#search").val();
+        /** Genera la url del endpoint de busqueda de la API */
         let url = `${DOMAIN}/api/search`;
+
+        /** Deja isSearch en true, ya que esta accion es de busqueda
+         * isFilter en false ya que no será una llamada por filtros */
         isSearch = true;
         isFilter = false;
+        
+        /** Llama a la funcion con sus parametros para retornar los productos */
         showProducts(url, searchText);
     }
 
-    /*
+    /**
     * Al hacer click en la paginacion se llama a la funcion que consume la api y obtiene los productos
     * si isSearch es true, entonces se agrega el texto a buscar
     */
     $("body").on("click", '.pagination a', function(e){
+        /** detiene la peticion */
         e.preventDefault();
+        /** obtiene la url del atributo href del elemento */
         let url = $(this).attr('href');
+
+        /**
+        * Si es una busqueda (isSearch) entonces llama a la funcion showProducts con sus parametros
+        */
         if(isSearch){
             showProducts(url, searchText);
-        }else if(isFilter){
+        }
+        /**
+        * Si es una busqueda por filtros (isFilter) entonces llama a la funcion showProductsFilter con sus parametros
+        */
+        else if(isFilter){
             showProductsFilter(url, {
                 categories: categoriesSelected,
                 price: priceFilter,
                 order: orderingSelected
             });
-        }else{
+        }
+        /**
+        * De lo contrario llama a showProducts sin ningun parametro de filtro agregado
+        */
+        else{
             showProducts(url);
         }
     });

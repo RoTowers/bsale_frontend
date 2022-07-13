@@ -118,7 +118,7 @@ Agrega los productos como galeria en el DOM, con la informacion y el botón de a
 
 | Name | Type | Default | Description |
 | ------------ | ------------ | ------------ | ------------ |
-| `products`   | Object    |  | Lista de productos |
+| `products`   | Array    |  | Lista de productos |
 
 ```javascript
 function fillGrid(products){
@@ -173,6 +173,73 @@ function fillGrid(products){
                 </div>
             </div>
         `);
+    });
+}
+```
+
+### showCategories(categories)
+
+Agrega los el filtro de categorias, con el nombre y la cantidad de productos por categoría.
+
+
+| Name | Type | Default | Description |
+| ------------ | ------------ | ------------ | ------------ |
+| `categories`   | Array    | [] | Lista de categorias |
+
+```javascript
+function showCategories(categories = []){
+    /** Recorre la lista de categorias */
+    categories.map((category, index) => {
+        /** Agrega la categoria con un checkbox al contenedor del filtro con sus repectivos datos (id, name, count) */
+        $('#categories').append(`
+            <div class="d-flex justify-content-between mt-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories[]" value="${category.id}" id="filter${index + 1}">
+                    <label class="form-check-label" for="filter${index + 1}"> ${capitalize(category.name)} </label>
+                </div>
+                <span class="form-check-span">${category.count}</span>
+            </div>
+        `);
+    });
+}
+```
+### pagination(links)
+
+Agrega los elementos para la paginacion en el DOM según la cantidad de paginas sean con sus respectivos enlaces a la API
+
+
+| Name | Type | Default | Description |
+| ------------ | ------------ | ------------ | ------------ |
+| `links`   | Array    | [] | Lista de links de paginación |
+
+```javascript
+function pagination(links){
+    /** Limpia el contenedor de la paginacion */
+    $('#pagination').empty();
+    /** Recorre la lista de links de paginacion */
+    links.map((link, i) => {
+        /** Si el indice es el primero (si es 0) entonces agrega el primer link con el texto '<<' */
+        if(i==0){
+            $('#pagination').append(`
+                <li class="page-item ${!link.url ? 'disabled' : ''}">
+                    <a class="page-link" href="${link.url}" tabindex="-1" aria-disabled="${link.url ? false : true}"><<</a>
+                </li>
+            `);
+        }
+        /** Si el indice es el ultimo entonces agrega el link con el texto '>>' */
+        else if(i==links.length - 1){
+            $('#pagination').append(`
+                <li class="page-item ${!link.url ? 'disabled' : ''}">
+                    <a class="page-link" href="${link.url}" aria-disabled="${link.url ? false : true}">>></a>
+                </li>
+            `);
+        }
+        /** De lo contrario agrega el enlace como cualquier otro */
+        else{
+            $('#pagination').append(`
+                <li class="page-item ${link.active ? 'active' : ''}"><a class="page-link" href="${link.url}">${link.label}</a></li>
+            `);
+        }
     });
 }
 ```
