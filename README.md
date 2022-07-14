@@ -352,7 +352,6 @@ function drawCart(){
 ------------
 
 
-
 ### showProducts(url, quantity)
 
 Funcion que consume la api y obtiene el resultado de los productos con oferta preferencialmente y limitados por una cantidad.
