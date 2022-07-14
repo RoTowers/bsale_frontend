@@ -18,30 +18,46 @@ $( document ).ready(function() {
     /** Actualiza el contador del icono de carrito de compras en el header */
     updateCart();
 
-    if (window.location.href.indexOf("?q=") > -1) {
-        searchText = getParameterValue("q");
-        $("#search").val(searchText);
+    /** Llama a la funcion que inicia la primera llamada a la API por los productos */
+    init();
 
-        // Se resetea el ordenamiento
-        if(isFilter){
-            $("#ordering-select").val('1');
-            orderingSelected = $("#ordering-select").val();
+    /**
+     * Funcion que inicia cuando se carga la pagina, haciendo la primera llamada a la API
+     */
+    function init(){
+         /** Se obtiene la url de la pagina*/
+        let url_string = window.location.href;
+         /** Se genera un objecto URL en base a la url_string */
+        let url = new URL(url_string);
+         /** Obtiene el valor del parametro q */
+        let textToSearch = url.searchParams.get("q");
+
+        /** Si se encuentra el parametro q en la url entonces procesa el texto de busqueda y llama a la API */
+        if (textToSearch != null) {
+            /** Obtiene el texto en el parametro q y lo guarda*/
+            searchText = textToSearch;
+            /** Lo agrega en el <input type="text"> de la busqueda */
+            $("#search").val(searchText);
+    
+            /** Se resetea el ordenamiento */
+            if(isFilter){
+                $("#ordering-select").val('1');
+                orderingSelected = $("#ordering-select").val();
+            }
+            /** Se genera la url para la peticion */
+            let url = `${DOMAIN}/api/search`;
+            /** Se deja isSearch en true y isFilter en false ya que esta accion sera una busqueda por texto */
+            isSearch = true;
+            isFilter = false;
+            /** Se envian estos parametros a la funcion que consume la API */
+            showProducts(url, searchText, true);
+        }else{
+            /** 
+             * En el caso que no se encuentre el parametro q, entonces la carga de la pagino no es por busqueda de Texto
+             * entonces se llama a la funcion normalmente
+             */
+            showProducts(URL_START, null, true);
         }
-
-        let url = `${DOMAIN}/api/search`;
-        isSearch = true;
-        isFilter = false;
-        showProducts(url, searchText, true);
-    }else{
-        // Se buscan las categorias y los productos al iniciar la pagina
-        showProducts(URL_START, null, true);
-    }
-
-    function getParameterValue(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     };
 
     /**
@@ -405,8 +421,14 @@ $( document ).ready(function() {
     /** Funcion que cambia a mayuscula la primera letra del texto a modificar */
     const capitalize = s => s && s[0].toUpperCase() + s.slice(1);
 
+    /**
+    * En caso de cambiar la opcion del select de ordenamiento
+    * llama a la funcion que consume la API, agregandole el filtro de ordenamiento
+    */
     $('#ordering-select').on('change', function() {
+        /** Guarda el valor seleccionado del select de ordenamiento */
         orderingSelected = $(this).val();
+        /** Llama a la funcion que prepara la llamada a la API, en base a la ultima accion, si fue busqueda de texto o por filtro */
         if(isSearch){
             search();
         }else if(isFilter){
@@ -416,56 +438,91 @@ $( document ).ready(function() {
         }
     });
 
-    // Al hacer click en el boton agregar al carrito obtiene el producto en la data del elemento y lo envia a la funcion addToCart
+    /**
+     *  Al hacer click en el boton agregar al carrito obtiene el producto en la data del elemento y lo envia a la funcion addToCart
+     */
     $(document).on('click', '.add-to-cart', function () {
+        /** Obitene el producto que se guardó en la tarjeta del mismo en la galeria */
         let product = JSON.parse(decodeURIComponent($(this).data("product")));
+        /** Lo agrega al carrito de compras */
         addToCart(product);
     });
 
+    /**
+     *  Funcion que agrega los productos en el carrito.
+     *  @param {Object} product - objeto de producto.
+     */
     function addToCart(product) {
+        /** Verifica si bsale_cart existe en el localStorage, si no existe lo crea con un arreglo vacio */
         if(localStorage.getItem('bsale_cart') == null){
             let cart = [];
+            /** agrega el arreglo vacio a la llave bsale_cart en el localStorage convirtiendolo a string */
             localStorage.setItem('bsale_cart', JSON.stringify(cart))
         }
 
+        /** Obtiene lo que contiene bsale_cart convertido en json */
         let cart = JSON.parse(localStorage.getItem('bsale_cart'))
+        /** Le agrega la llave quantity y la inicializa en 1 */
         product.quantity = 1;
+        /** Busca el producto en el carrito si es que existe */
         let productFound = cart.filter(cart => cart.id == product.id);
         
+        /** Si el producto no se encontro en el carrito, entonces lo agrega como producto nuevo dentro de el */
         if(productFound.length == 0){
             cart.push(product)
         }else{
+            /** En el caso de que si exista en el carrito, entonces se busca el producto en el carrito */
             cart.map(cart => {
+                /** Cuando encuentra el producto, solo le suma 1 al quantity del producto */
                 if(cart.id == product.id){
                     cart.quantity++;
                 }
             });
         }
+
+        /** Devuelve el carrito al localStorage convirtiendolo a string */
         localStorage.setItem('bsale_cart', JSON.stringify(cart))
 
-        // Actualiza el contador del carrito
+        /** Actualiza el contador del icono de carrito de compras en el header */
         updateCart();
     };
 
+    /**
+     *  Actualiza el contador del icono de carrito de compras en el header
+     */
     function updateCart(){
+        /** Verifica si bsale_cart existe en el localStorage, si no existe lo crea con un arreglo vacio */
         if(localStorage.getItem('bsale_cart') == null){
             let cart = [];
+            /** agrega el arreglo vacio a la llave bsale_cart en el localStorage convirtiendolo a string */
             localStorage.setItem('bsale_cart', JSON.stringify(cart))
         }
 
+        /** Obtiene lo que contiene bsale_cart convertido en json */
         let cart = JSON.parse(localStorage.getItem('bsale_cart'));
 
+        /** Actualiza el contador del header con la cantidad total de productos diferentes en el carrito */
         $("#cart-counter").text(cart.length);
     }
 
+    /**
+     *  Agrega el carrito en la ventana modal cuando se hace click en el boton del carrito en el header
+     */
     $("#cart-button").on("click", function(){
         drawCart();
     });
 
+    /**
+     *  Dibuja la tabla de lo que contiene el carrito en la ventana modal
+     */
     function drawCart(){
+        /** Obtiene lo que contiene bsale_cart convertido en json */
         let cart = JSON.parse(localStorage.getItem('bsale_cart'));
+        /** Limpia el contenedor de la tabla en la ventana modal */
         $("#cart-container").empty();
+        /** Inicializa el total de la suma de todos los precios de productos con sus cantidades en el carrito en 0 */
         let total = 0;
+        /** Recorre el carrito y va agregando una fila con sus columnas y valores como image, name, id, quantity, etc a la tabla */
         cart.map((product) => {
             $("#cart-container").append(`
                 <tr scope="row">
@@ -495,8 +552,11 @@ $( document ).ready(function() {
                     <td><span style="cursor:pointer; color:red;" class="remove" data-id="${product.id}"><i class="bi bi-dash-circle"></i></span></td>
                 </tr>
             `);
+            /** Va sumando el precio al total pero con el porcentaje de descuento */
             total += ((product.price - (product.price*product.discount) / 100)) * product.quantity;
         });
+
+        /** Finalmente agrega la suma de precios total al final de la tabla, formateada en pesos */
         $("#cart-container").append(`
             <tr scope="row">
                 <td colspan="2"></td>
@@ -506,51 +566,97 @@ $( document ).ready(function() {
                 <td><h4 id="total">${ new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(total) } CLP</h4></td>
             </tr>
         `);
-    }
+    };
 
+    /**
+     *  En caso de clickear el boton menos en la columna cantidad de la tabla en el carrito
+     *  le resta 1 a la cantidad
+     */
     $(document).on('click', '.button-min', function () {
+        /** Obitene el id del producto que se guardó en la fila donde se encuentra el boton que se está clickeando */
         let productId = $(this).data("id");
+        /** Obtiene lo que contiene bsale_cart convertido en json */
         let cart = JSON.parse(localStorage.getItem('bsale_cart'));
+        /** Variable que guardará la suma total de los precios de productos en el carrito */
         let total = 0;
+        /** Itera todos los productos en el carrito */
         cart.map(product => {
+            /** 
+             * Si encuentra el producto en el carrito y ademas el prducto tiene una cantidad mayor a 1 entonces
+             * le resta 1 a la cantidad
+             */
             if(product.id == productId && product.quantity > 1){
                 product.quantity--;
+                /** Actualiza el contador de quantity en la ventana modal */
                 $(`#qty-${product.id}`).val(product.quantity);
+                /** Actualiza el total de precios de ese producto en especifico en el carrito */
                 $(`#total-price-${product.id}`).text(`${new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(((product.price - (product.price*product.discount) / 100)) * product.quantity) } CLP`);
             }
+            /** Va sumando el precio al total pero con el porcentaje de descuento */
             total += ((product.price - (product.price*product.discount) / 100)) * product.quantity;
         });
+        /** Finalmente actualiza la suma de precios total al final de la tabla, formateada en pesos */
         $("#total").text(`${ new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(total) } CLP`);
+        /** Actualiza el carrito al localStorage convirtiendolo a string */
         localStorage.setItem('bsale_cart', JSON.stringify(cart));
     });
 
-
+    /**
+     *  En caso de clickear el boton mas en la columna cantidad de la tabla en el carrito
+     *  le suma 1 a la cantidad
+     */
     $(document).on('click', '.button-plus', function () {
+        /** Obitene el id del producto que se guardó en la fila donde se encuentra el boton que se está clickeando */
         let productId = $(this).data("id");
-        let cart = JSON.parse(localStorage.getItem('bsale_cart'))
+        /** Obtiene lo que contiene bsale_cart convertido en json */
+        let cart = JSON.parse(localStorage.getItem('bsale_cart'));
+        /** Variable que guardará la suma total de los precios de productos en el carrito */
         let total = 0;
+        /** Itera todos los productos en el carrito */
         cart.map(product => {
+            /** 
+             * Si encuentra el producto en el carrito y ademas el prducto tiene una cantidad menor a 10 entonces
+             * le suma 1 a la cantidad
+             */
             if(product.id == productId && product.quantity < 10){
                 product.quantity++;
+                /** Actualiza el contador de quantity en la ventana modal */
                 $(`#qty-${product.id}`).val(product.quantity);
+                /** Actualiza el total de precios de ese producto en especifico en el carrito */
                 $(`#total-price-${product.id}`).text(`${new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(((product.price - (product.price*product.discount) / 100)) * product.quantity) } CLP`);
             }
+            /** Va sumando el precio al total pero con el porcentaje de descuento */
             total += ((product.price - (product.price*product.discount) / 100)) * product.quantity;
         });
+        /** Finalmente actualiza la suma de precios total al final de la tabla, formateada en pesos */
         $("#total").text(`${ new Intl.NumberFormat("es-CL", {style: "currency", currency: "CLP", minimumFractionDigits: 0}).format(total) } CLP`);
+        /** Actualiza el carrito al localStorage convirtiendolo a string */
         localStorage.setItem('bsale_cart', JSON.stringify(cart));
     });
 
+    /**
+     *  En caso de clickear el boton eliminar en la ultima columna de la tabla en el carrito
+     *  elimina el producto del carrito
+     */
     $(document).on('click', '.remove', function () {
+        /** Obitene el id del producto que se guardó en la fila donde se encuentra el boton que se está clickeando */
         let productId = $(this).data("id");
+        /** Obtiene lo que contiene bsale_cart convertido en json */
         let cart = JSON.parse(localStorage.getItem('bsale_cart'));
 
+        /** 
+         * Filtra el carrito con todos los productos menos el producto que se va a eliminar
+         * de esta forma, el producto se elimina del Carrito
+         */
         let newCart = cart.filter(product => product.id !== productId);
 
+        /** Agrega el nuevo carrito al localStorage */
         localStorage.setItem('bsale_cart', JSON.stringify(newCart));
 
+        /** Actualiza el contador del icono de carrito de compras en el header*/
         $("#cart-counter").text(newCart.length);
 
+        /** Actualiza el carrito de compras en el DOM */
         drawCart();
     });
 
