@@ -87,19 +87,29 @@ $( document ).ready(function() {
                 }, 500);
             },
             success: function(response) {
-                /** En caso que sea la primera vez que se llama a la funcion */
-                if(start){
-                    /** Se agregan los filtros de categorias y rangos de Precios
-                     * tambien se deja la variable start como falso para que no realice esta operacion nuevamente
-                     */
-                    showCategories(response.data2);
-                    startRange(response.data3[0].min, response.data3[0].max);
-                    start = false;
+                if(response.status == 1){
+                    /** En caso que sea la primera vez que se llama a la funcion */
+                    if(start){
+                        /** Se agregan los filtros de categorias y rangos de Precios
+                         * tambien se deja la variable start como falso para que no realice esta operacion nuevamente
+                         */
+                        showCategories(response.data2);
+                        startRange(response.data3[0].min, response.data3[0].max);
+                        start = false;
+                    }
+                    /** Llama a la funcion que dibuja la galeria con las tarjetas de los productos */
+                    fillGrid(response.data.data);
+                    /** Se procede a llamar a la funcion que implementa la paginacion*/
+                    pagination(response.data.links);
                 }
-                /** Llama a la funcion que dibuja la galeria con las tarjetas de los productos */
-                fillGrid(response.data.data);
-                /** Se procede a llamar a la funcion que implementa la paginacion*/
-                pagination(response.data.links);
+
+                if(response.status == 2){
+                    Swal.fire(
+                        'Ups!',
+                        response.message,
+                        'error'
+                      );
+                }
             },
             error: function (request, status, error) {
                 /** Si hubo algún error se despliega este mensaje en un alerta con Sweet Alert */
