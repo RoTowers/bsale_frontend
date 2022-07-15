@@ -1,3 +1,21 @@
+# REAMDE.md
+
+Proyecto de e-commerce en Javascript consumiendo una API Rest. Muestra un home con los productos con descuentos y una tienda con todos los productos que existen en ella, con funcionalidades para filtrar por categoria y rango de precios además de ordenar por nombre y precio de productos, además cuenta con un buscador para encontrar el producto deseado con mayor facilidad.
+
+## Contenido
+Dentro de este proyecto encontrarás una carpeta `./src`con las 2 paginas HTML, además de una carpeta `./src/js` donde hallarás los archivos javascript para la funcionalidad de esta.
+
+## Características
+- Home con productos con descuentos
+- Tienda con funcionalidad de filtros, buscador y paginación
+- Carrito de compras
+
+## Demo
+Si quieres ver una demo de este proyecto, puedes visitar [Demo del proyecto](https://pacific-river-42460.herokuapp.com/)
+
+
+------------
+
 # Documentacion
 
 ## Métodos
