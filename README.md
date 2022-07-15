@@ -16,7 +16,7 @@ Si quieres ver una demo de este proyecto, puedes visitar [Demo del proyecto](htt
 
 ------------
 
-# Documentacion
+# Documentación
 
 ## Métodos
 
