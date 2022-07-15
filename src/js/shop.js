@@ -87,6 +87,7 @@ $( document ).ready(function() {
                 }, 500);
             },
             success: function(response) {
+                /** Si el status es 1, el retorno es exitoso, entonces procede a realizar las siguiente acciones */
                 if(response.status == 1){
                     /** En caso que sea la primera vez que se llama a la funcion */
                     if(start){
@@ -103,6 +104,7 @@ $( document ).ready(function() {
                     pagination(response.data.links);
                 }
 
+                /** Cuando el status es 2, quiere decir que ocurrio algun problema y se muestra una alerta */
                 if(response.status == 2){
                     Swal.fire(
                         'Ups!',
@@ -147,10 +149,22 @@ $( document ).ready(function() {
                 }, 500);
             },
             success: function(response) {
-                /** Llama a la funcion que dibuja la galeria con las tarjetas de los productos */
-                fillGrid(response.data.data);
-                /** Se procede a llamar a la funcion que implementa la paginacion*/
-                pagination(response.data.links);
+                /** Si el status es 1, el retorno es exitoso, entonces procede a realizar las siguiente acciones */
+                if(response.status == 1){
+                    /** Llama a la funcion que dibuja la galeria con las tarjetas de los productos */
+                    fillGrid(response.data.data);
+                    /** Se procede a llamar a la funcion que implementa la paginacion*/
+                    pagination(response.data.links);
+                }
+
+                /** Cuando el status es 2, quiere decir que ocurrio algun problema y se muestra una alerta */
+                if(response.status == 2){
+                    Swal.fire(
+                        'Ups!',
+                        response.message,
+                        'error'
+                      );
+                }
             },
             error: function (request, status, error) {
                 /** Si hubo algún error se despliega este mensaje en un alerta con Sweet Alert */
